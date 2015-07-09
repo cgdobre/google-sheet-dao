@@ -33,7 +33,7 @@ import com.google.gdata.util.ServiceException;
 public class GoogleSheetDAO {
 
 	/** Our view of Google Spreadsheets as an authenticated Google user. */
-	private SpreadsheetService service;
+	private final SpreadsheetService service = new SpreadsheetService("google-sheet-dao");
 
 	/** A factory that generates the appropriate feed URLs. */
 	final private FeedURLFactory factory = FeedURLFactory.getDefault();
@@ -92,8 +92,6 @@ public class GoogleSheetDAO {
 	 * Log in to Google, under a Google Spreadsheets account.
 	 */
 	private void login(final String username, final File p12key) throws GeneralSecurityException, IOException {
-		service = new SpreadsheetService("google-sheet-dao");
-
 		// Authenticate
 		final String[] SCOPESArray = {
 				"https://spreadsheets.google.com/feeds",
@@ -215,5 +213,9 @@ public class GoogleSheetDAO {
 
 		entry.update(); // This updates the existing entry.
 	}
-
+	
+	public List<ListEntry> getRows() throws IOException, ServiceException {
+		ListFeed feed = service.getFeed(worksheet.getListFeedUrl(), ListFeed.class);
+		return feed.getEntries();
+	}
 }
